@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Vaishnavi Kedar Portfolio"
+description = "A public personal portfolio for Vaishnavi Kedar, presenting her UI/UX and full-stack work, design process, education, milestones, certifications, and contact links."
+version = "1.0.0"
+id = "artifacts/vaishnavi-portfolio"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18919
+
+[services.development]
+run = "pnpm --filter @workspace/vaishnavi-portfolio run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/vaishnavi-portfolio", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/vaishnavi-portfolio/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18919"
+BASE_PATH = "/"
