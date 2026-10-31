@@ -1,6 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-export default function InteractiveCard3D({ children, className = '', depth = 20, glowColor = 'rgba(214, 51, 108, 0.18)', ...props }) {
+export default function InteractiveCard3D({
+  children,
+  className = '',
+  depth = 20,
+  glowColor = 'rgba(214, 51, 108, 0.18)',
+  id = undefined,
+  ...props
+}) {
   const cardRef = useRef(null);
   const [style, setStyle] = useState({});
   const [spotlight, setSpotlight] = useState({ x: 50, y: 50, opacity: 0 });
@@ -51,6 +58,7 @@ export default function InteractiveCard3D({ children, className = '', depth = 20
   return (
     <div
       ref={cardRef}
+      id={id}
       className={`interactive-3d-card ${className}`}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}

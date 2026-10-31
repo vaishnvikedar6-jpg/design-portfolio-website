@@ -53,6 +53,7 @@ export const DOORS_DATA = [
         primaryLabel: 'Launch Live Platform',
         githubLink: 'https://github.com/vaishnvikedar6-jpg',
         image: 'coursereg-cicd.jpg',
+        targetCardId: 'project-coursereg',
       },
       {
         id: 'cyberguard',
@@ -74,6 +75,7 @@ export const DOORS_DATA = [
         tags: ['Three.js', 'React Three Fiber', 'GSAP', 'WebGL'],
         primaryLink: '#home',
         primaryLabel: 'Explore 3D Home',
+        targetCardId: 'project-portfolio',
       },
     ],
   },
@@ -102,6 +104,19 @@ export const DOORS_DATA = [
         primaryLabel: 'View Repository',
         githubLink: 'https://github.com/vaishnvikedar6-jpg/Ayushlink-Final',
         image: 'ayushlink.jpg',
+        targetCardId: 'project-ayushlink',
+      },
+      {
+        id: 'anuvaad',
+        title: 'Anuvaad Chatbot',
+        badge: 'Conversational AI',
+        excerpt:
+          'Multilingual artificial intelligence translation and conversational bot bridging 22 official languages across Bharat. Features instant dialect translation and speech translation workflows.',
+        tags: ['22 Languages', 'Multilingual NLP', 'React', 'AI Chat UI'],
+        primaryLink: 'https://vaishnvikedar6-jpg.github.io/Anuvaad-The-Chatbot/',
+        primaryLabel: 'Launch Live Chatbot',
+        image: 'anuvaad.png',
+        targetCardId: 'project-anuvaad',
       },
       {
         id: 'smoothiefy',
@@ -113,6 +128,7 @@ export const DOORS_DATA = [
         primaryLink: '#work',
         primaryLabel: 'Inspect Mobile Flows',
         image: 'smoothiefy-1.png',
+        targetCardId: 'project-smoothiefy',
       },
     ],
   },
@@ -142,6 +158,7 @@ export const DOORS_DATA = [
         primaryLabel: 'Interactive Figma Prototype',
         caseStudyId: 'avira',
         image: 'avira-1.png',
+        targetCardId: 'project-avira',
       },
       {
         id: 'civic-fix',
@@ -154,6 +171,7 @@ export const DOORS_DATA = [
         primaryLabel: 'Figma Prototype',
         caseStudyId: 'civic-fix',
         image: 'civic-fix-1.png',
+        targetCardId: 'project-civic-fix',
       },
       {
         id: 'aura',
@@ -166,6 +184,7 @@ export const DOORS_DATA = [
           'https://www.figma.com/proto/Ampa8dUqHSzoXFItj7pm28/Untitled?node-id=1-3&starting-point-node-id=1%3A3',
         primaryLabel: 'Explore in Figma',
         image: 'aura-1.png',
+        targetCardId: 'project-aura',
       },
     ],
   },
@@ -194,6 +213,7 @@ export const DOORS_DATA = [
           'https://www.figma.com/proto/4z78d3naEOI0XzCR0oc4J7/AVIRA?node-id=12-790&t=FlMtIR4sxAwxxGSA-1',
         primaryLabel: 'View Project Prototype',
         image: 'miss-beautiful-1.png',
+        targetCardId: 'project-miss-beautiful',
       },
       {
         id: 'design-artifacts',
@@ -204,6 +224,7 @@ export const DOORS_DATA = [
         tags: ['Design Systems', 'Typography', 'Figma Tokens'],
         primaryLink: '#work',
         primaryLabel: 'Inspect Gallery',
+        targetCardId: 'project-miss-beautiful',
       },
     ],
   },
@@ -721,6 +742,32 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
       setActiveDoorId(null);
     } else {
       setActiveDoorId(doorId);
+      // AUTOMATED NAVIGATION: As the 3D arched door swings open on its hinge, smoothly glide the visitor directly inside to that domain's projects!
+      setTimeout(() => {
+        const chamberEl = document.getElementById('domain-projects-chamber');
+        if (chamberEl) {
+          chamberEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 520);
+    }
+  };
+
+  const scrollToDoors = () => {
+    const el = document.getElementById('doors-container');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const scrollToProject = (targetCardId) => {
+    if (!targetCardId) return;
+    const targetEl = document.getElementById(targetCardId);
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetEl.classList.add('highlight-pulse');
+      setTimeout(() => {
+        targetEl.classList.remove('highlight-pulse');
+      }, 2600);
     }
   };
 
@@ -834,6 +881,7 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
           ========================================================================= */}
       {activeDoor && (
         <div
+          id="domain-projects-chamber"
           className="door-chamber-reveal"
           style={{
             '--chamber-accent': activeDoor.glowColor,
@@ -850,6 +898,15 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
             </div>
             <div className="chamber-right">
               <button
+                type="button"
+                className="chamber-nav-btn"
+                onClick={scrollToDoors}
+                title="Return to 3D doors view"
+              >
+                ↑ Back to Doors
+              </button>
+              <button
+                type="button"
                 className="chamber-close-btn"
                 onClick={() => setActiveDoorId(null)}
                 aria-label="Close portal"
@@ -888,6 +945,7 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
                   <div className="chamber-actions">
                     {proj.caseStudyId && openCaseStudy ? (
                       <button
+                        type="button"
                         className="pill pill-primary pill-sm"
                         onClick={(e) => openCaseStudy(proj.caseStudyId, e.currentTarget)}
                       >
@@ -918,10 +976,31 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
                         GitHub <ArrowUpRight size={14} />
                       </a>
                     )}
+
+                    {proj.targetCardId && (
+                      <button
+                        type="button"
+                        className="pill pill-chamber-jump pill-sm"
+                        onClick={() => scrollToProject(proj.targetCardId)}
+                        title="Locate this project in the full showcase"
+                      >
+                        View in Showcase ↓
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Chamber Footer Bar */}
+          <div className="chamber-bottom-bar">
+            <button type="button" className="chamber-back-top-btn" onClick={scrollToDoors}>
+              <RotateCcw size={14} /> Return to 3D Arched Doors
+            </button>
+            <a href="#work" className="chamber-explore-all-btn">
+              Explore All Projects in Full Showcase ↓
+            </a>
           </div>
         </div>
       )}

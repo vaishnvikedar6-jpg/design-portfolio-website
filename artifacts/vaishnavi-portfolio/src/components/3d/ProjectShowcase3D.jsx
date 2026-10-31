@@ -53,6 +53,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
     <div className="projects-showcase-3d">
       {/* 1. FEATURED HERO PROJECT: AVIRA (Women Safety Transit Companion) */}
       <InteractiveCard3D
+        id="project-avira"
         className="featured-project-3d"
         depth={25}
         glowColor="rgba(214, 51, 108, 0.25)"
@@ -165,7 +166,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
       {/* 2. SECONDARY 3D PROJECTS GRID */}
       <div className="projects-cards-grid">
         {/* AYUSHLINK-FINAL: Healthcare-Themed 3D Dashboard */}
-        <InteractiveCard3D className="project-grid-card healthcare-card" depth={20} glowColor="rgba(32, 201, 151, 0.22)">
+        <InteractiveCard3D id="project-ayushlink" className="project-grid-card healthcare-card" depth={20} glowColor="rgba(32, 201, 151, 0.22)">
           <div className="card-image-display ayushlink-preview-wrap">
             <a href={LINKS.ayushlink} {...externalProps}>
               <img
@@ -201,7 +202,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
         </InteractiveCard3D>
 
         {/* ANUVAAD CHATBOT: Layered 3D Multilingual AI Chat Showcase */}
-        <InteractiveCard3D className="project-grid-card anuvaad-card" depth={20} glowColor="rgba(214, 51, 108, 0.22)">
+        <InteractiveCard3D id="project-anuvaad" className="project-grid-card anuvaad-card" depth={20} glowColor="rgba(214, 51, 108, 0.22)">
           <div className="card-image-display anuvaad-preview-wrap">
             <img
               src={asset('anuvaad.png')}
@@ -235,7 +236,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
         </InteractiveCard3D>
 
         {/* CIVIC FIX: Smart Civic Reporter Hackathon Prototype */}
-        <InteractiveCard3D className="project-grid-card civic-fix-card" depth={20} glowColor="rgba(110, 68, 89, 0.22)">
+        <InteractiveCard3D id="project-civic-fix" className="project-grid-card civic-fix-card" depth={20} glowColor="rgba(110, 68, 89, 0.22)">
           <div className="card-image-display">
             <img
               src={asset('civic-fix-1.png')}
@@ -273,7 +274,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
         </InteractiveCard3D>
 
         {/* COURSE REGISTRATION CI/CD & DEVELOPER DASHBOARD */}
-        <InteractiveCard3D className="project-grid-card pipeline-card" depth={20} glowColor="rgba(212, 139, 153, 0.22)">
+        <InteractiveCard3D id="project-coursereg" className="project-grid-card pipeline-card" depth={20} glowColor="rgba(212, 139, 153, 0.22)">
           <div className="card-image-display cicd-preview-wrap">
             <a href="https://course-registration-dashboard.onrender.com/" {...externalProps}>
               <img
@@ -312,7 +313,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
         </InteractiveCard3D>
 
         {/* MY DESIGN PORTFOLIO: Dimensional Browser Window Mockup */}
-        <InteractiveCard3D className="project-grid-card portfolio-window-card" depth={20} glowColor="rgba(214, 51, 108, 0.25)">
+        <InteractiveCard3D id="project-portfolio" className="project-grid-card portfolio-window-card" depth={20} glowColor="rgba(214, 51, 108, 0.25)">
           <div className="browser-mockup-header" aria-hidden="true">
             <div className="browser-dots">
               <span className="dot red" />
@@ -354,7 +355,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
         </InteractiveCard3D>
 
         {/* AURA: Women's Wellness App */}
-        <InteractiveCard3D className="project-grid-card aura-card" depth={20} glowColor="rgba(128, 43, 77, 0.22)">
+        <InteractiveCard3D id="project-aura" className="project-grid-card aura-card" depth={20} glowColor="rgba(128, 43, 77, 0.22)">
           <div className="card-image-display aura-bg">
             <img
               src={asset('aura-1.png')}
@@ -384,7 +385,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
         </InteractiveCard3D>
 
         {/* MISS BEAUTIFUL: Luxury Beauty Editorial */}
-        <InteractiveCard3D className="project-grid-card miss-beautiful-card" depth={20} glowColor="rgba(214, 51, 108, 0.22)">
+        <InteractiveCard3D id="project-miss-beautiful" className="project-grid-card miss-beautiful-card" depth={20} glowColor="rgba(214, 51, 108, 0.22)">
           <div className="dual-image-preview">
             <a href={asset('miss-beautiful-1.png')} target="_blank" rel="noopener noreferrer">
               <img src={asset('miss-beautiful-1.png')} alt="Miss Beautiful screen 1" width="500" height="340" loading="lazy" />
@@ -413,7 +414,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
         </InteractiveCard3D>
 
         {/* SMOOTHIEFY: Interactive Smartphone Trio */}
-        <InteractiveCard3D className="project-grid-card smoothiefy-card" depth={20} glowColor="rgba(214, 51, 108, 0.22)">
+        <InteractiveCard3D id="project-smoothiefy" className="project-grid-card smoothiefy-card" depth={20} glowColor="rgba(214, 51, 108, 0.22)">
           <div className="trio-phone-preview" role="group" aria-label="Smoothiefy app screens">
             <img className="phone-sub phone-left" src={asset('smoothiefy-2.png')} alt="Smoothiefy login screen" width="160" height="340" loading="lazy" />
             <img className="phone-main" src={asset('smoothiefy-1.png')} alt="Smoothiefy splash screen" width="165" height="340" loading="lazy" />
