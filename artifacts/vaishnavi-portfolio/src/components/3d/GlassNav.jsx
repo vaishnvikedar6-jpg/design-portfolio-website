@@ -8,6 +8,7 @@ export default function GlassNav({ active, progress }) {
 
   const navItems = [
     { label: 'Home', id: 'home' },
+    { label: 'Doors', id: 'doors' },
     { label: 'Work', id: 'work' },
     { label: 'Skills', id: 'skills' },
     { label: 'About', id: 'about' },

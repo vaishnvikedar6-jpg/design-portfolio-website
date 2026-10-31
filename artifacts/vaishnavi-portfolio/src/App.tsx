@@ -27,6 +27,7 @@ import AboutScene3D from './components/3d/AboutScene3D';
 import ContactScene3D from './components/3d/ContactScene3D';
 import CustomCursor from './components/3d/CustomCursor';
 import GlassNav from './components/3d/GlassNav';
+import CinematicDoors3D from './components/3d/CinematicDoors3D';
 import ProjectShowcase3D from './components/3d/ProjectShowcase3D';
 import Skills3D from './components/3d/Skills3D';
 import Timeline3D from './components/3d/Timeline3D';
@@ -458,6 +459,15 @@ function App() {
                 </div>
               </div>
             </InteractiveCard3D>
+          </div>
+        </section>
+
+        {/* =================================================================
+            CINEMATIC 3D ARCHED DOORS SECTION: "Magic happens behind the doors"
+            ================================================================= */}
+        <section className="section doors-section" id="doors" style={{ paddingTop: '20px', paddingBottom: '10px' }}>
+          <div className="container">
+            <CinematicDoors3D openCaseStudy={openCaseStudy} LINKS={LINKS} />
           </div>
         </section>
 
