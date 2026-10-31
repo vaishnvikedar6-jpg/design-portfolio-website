@@ -312,7 +312,7 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
           </div>
         </InteractiveCard3D>
 
-        {/* MY DESIGN PORTFOLIO: Dimensional Browser Window Mockup */}
+        {/* MY DESIGN PORTFOLIO: Dimensional Browser Window Mockup with Hero Cover Image */}
         <InteractiveCard3D id="project-portfolio" className="project-grid-card portfolio-window-card" depth={20} glowColor="rgba(214, 51, 108, 0.25)">
           <div className="browser-mockup-header" aria-hidden="true">
             <div className="browser-dots">
@@ -325,13 +325,18 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
               <span>vaishnavikedar.design/3d-portfolio</span>
             </div>
           </div>
-          <div className="browser-mockup-body">
-            <div className="mini-hero-preview">
-              <div className="mini-photo-circle">
-                <img src={asset('hero-photo.png')} alt="Vaishnavi Kedar" width="80" height="80" />
-              </div>
-              <div className="mini-title">I design how it feels.</div>
-              <div className="mini-sub">3D Interactive Portfolio · Three.js & React</div>
+          <div className="card-image-display portfolio-cover-wrap">
+            <a href="#home">
+              <img
+                src={asset('portfolio-cover.jpg')}
+                alt="Vaishnavi Kedar 3D Interactive Portfolio Hero Cover"
+                width="600"
+                height="338"
+                loading="lazy"
+              />
+            </a>
+            <div className="canvas-badge creative">
+              <Sparkles size={14} /> Active 3D Environment
             </div>
           </div>
           <div className="card-body">
@@ -347,9 +352,9 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
               <span className="card-tag">3D WebGL</span>
             </div>
             <div className="card-footer">
-              <span className="status-live-indicator">
-                <span className="status-dot green" /> Active 3D Environment
-              </span>
+              <a href="#home" className="card-action-btn">
+                Explore 3D Home <ArrowRight size={15} />
+              </a>
             </div>
           </div>
         </InteractiveCard3D>
@@ -436,9 +441,48 @@ export default function ProjectShowcase3D({ openCaseStudy, LINKS }) {
             </div>
           </div>
         </InteractiveCard3D>
+
+        {/* CYBERGUARD: Total Cyber Protection Landing Page */}
+        <InteractiveCard3D id="project-cyberguard" className="project-grid-card cyberguard-card" depth={20} glowColor="rgba(139, 40, 207, 0.22)">
+          <div className="card-image-display cyberguard-preview-wrap">
+            <a href={LINKS.cyberGuard} {...externalProps}>
+              <img
+                src={asset('cyberguard.jpg')}
+                alt="CyberGaurd - Total Cyber Protection Landing Interface"
+                width="600"
+                height="338"
+                loading="lazy"
+              />
+            </a>
+            <div className="canvas-badge cyberguard">
+              <ShieldCheck size={14} /> Web Security Suite
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-category">Cybersecurity · Oasis Infobyte</div>
+            <h3 className="card-title">CyberGuard Security Suite</h3>
+            <p className="card-excerpt">
+              Modern cybersecurity and vulnerability assessment landing interface designed with 24/7 digital identity protection, responsive system tokens, and high-contrast accessibility.
+            </p>
+            <div className="card-tags">
+              <span className="card-tag">Web Security</span>
+              <span className="card-tag">Frontend UI</span>
+              <span className="card-tag">Responsive Tokens</span>
+              <span className="card-tag">Oasis Infobyte</span>
+            </div>
+            <div className="card-footer-buttons">
+              <a href={LINKS.cyberGuard} {...externalProps} className="card-action-btn">
+                Launch Live Site <ArrowUpRight size={14} />
+              </a>
+              <a href={LINKS.github} {...externalProps} className="card-text-btn">
+                GitHub <ArrowUpRight size={14} />
+              </a>
+            </div>
+          </div>
+        </InteractiveCard3D>
       </div>
 
-      {/* ADDITIONAL MENTION ACCENT: CyberGuard Suite & Smart City */}
+      {/* ADDITIONAL MENTION ACCENT: Smart City Planning Dashboard */}
       <div className="also-built-3d-box">
         <h4 className="also-title">
           <Terminal size={18} className="icon-rose" /> Also Engineered & Designed

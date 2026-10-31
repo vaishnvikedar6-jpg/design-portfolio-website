@@ -2961,6 +2961,64 @@ body { overflow-x:clip; }
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25) !important;
 }
 
+/* 3D Portfolio Hero Cover Wrap */
+.portfolio-cover-wrap {
+  position: relative;
+  height: 220px;
+  background: #fdf2f5 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+.portfolio-cover-wrap a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.portfolio-cover-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: top center !important;
+  transition: transform 0.4s ease !important;
+}
+.project-grid-card:hover .portfolio-cover-wrap img {
+  transform: scale(1.05) !important;
+}
+.canvas-badge.creative {
+  background: rgba(255, 240, 246, 0.94);
+  color: #de5d95;
+  border: 1px solid rgba(222, 93, 149, 0.35);
+}
+
+/* CyberGuard Total Cyber Protection Preview Styling */
+.cyberguard-preview-wrap {
+  position: relative;
+  height: 220px;
+  background: #8b28cf !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+.cyberguard-preview-wrap a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.cyberguard-preview-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: top center !important;
+  transition: transform 0.4s ease !important;
+}
+.project-grid-card:hover .cyberguard-preview-wrap img {
+  transform: scale(1.05) !important;
+}
+.canvas-badge.cyberguard {
+  background: rgba(243, 232, 255, 0.94);
+  color: #7928ca;
+  border: 1px solid rgba(121, 40, 202, 0.3);
+}
+
 /* =========================================================================
    CINEMATIC 3D ARCHED DOORS SECTION STYLING
    ========================================================================= */

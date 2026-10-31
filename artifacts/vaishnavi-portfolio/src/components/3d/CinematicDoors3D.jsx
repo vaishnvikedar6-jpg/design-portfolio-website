@@ -33,10 +33,10 @@ export const DOORS_DATA = [
     category: 'WEB DEVELOPMENT',
     title: 'Web Systems & Cloud Infrastructure',
     tagline: 'High-availability architectures, zero-downtime pipelines & production web systems',
-    color: '#1E2C3D', // Muted navy blue
-    accentColor: '#162230',
-    glowColor: '#4A7CA8',
-    frameColor: '#FAF4ED',
+    color: '#415B76', // Refined French Slate Navy
+    accentColor: '#30455B',
+    glowColor: '#7AA3D1',
+    frameColor: '#FAF5F0',
     goldColor: '#E6CA7E',
     number: '01',
     description:
@@ -65,6 +65,8 @@ export const DOORS_DATA = [
         primaryLink: 'https://vaishnvikedar6-jpg.github.io/OIBSIP/Level1_Task1/',
         primaryLabel: 'View Live Site',
         githubLink: 'https://github.com/vaishnvikedar6-jpg',
+        image: 'cyberguard.jpg',
+        targetCardId: 'project-cyberguard',
       },
       {
         id: '3d-portfolio',
@@ -75,6 +77,7 @@ export const DOORS_DATA = [
         tags: ['Three.js', 'React Three Fiber', 'GSAP', 'WebGL'],
         primaryLink: '#home',
         primaryLabel: 'Explore 3D Home',
+        image: 'portfolio-cover.jpg',
         targetCardId: 'project-portfolio',
       },
     ],
@@ -84,10 +87,10 @@ export const DOORS_DATA = [
     category: 'APP DEVELOPMENT',
     title: 'Mobile Architecture & Offline Systems',
     tagline: 'Resilient mobile apps, offline telemetry & seamless user onboarding',
-    color: '#5E4B6E', // Dusty lavender / muted purple
-    accentColor: '#4A3959',
-    glowColor: '#9C7BB8',
-    frameColor: '#FAF4ED',
+    color: '#6B547C', // Refined Wisteria Plum Lavender
+    accentColor: '#533F62',
+    glowColor: '#B08DC9',
+    frameColor: '#FAF5F0',
     goldColor: '#E6CA7E',
     number: '02',
     description:
@@ -105,18 +108,6 @@ export const DOORS_DATA = [
         githubLink: 'https://github.com/vaishnvikedar6-jpg/Ayushlink-Final',
         image: 'ayushlink.jpg',
         targetCardId: 'project-ayushlink',
-      },
-      {
-        id: 'anuvaad',
-        title: 'Anuvaad Chatbot',
-        badge: 'Conversational AI',
-        excerpt:
-          'Multilingual artificial intelligence translation and conversational bot bridging 22 official languages across Bharat. Features instant dialect translation and speech translation workflows.',
-        tags: ['22 Languages', 'Multilingual NLP', 'React', 'AI Chat UI'],
-        primaryLink: 'https://vaishnvikedar6-jpg.github.io/Anuvaad-The-Chatbot/',
-        primaryLabel: 'Launch Live Chatbot',
-        image: 'anuvaad.png',
-        targetCardId: 'project-anuvaad',
       },
       {
         id: 'smoothiefy',
@@ -137,10 +128,10 @@ export const DOORS_DATA = [
     category: 'UI/UX DESIGN',
     title: 'Human-Centered Product Design',
     tagline: 'Research-backed interfaces, transit safety innovations & design systems',
-    color: '#3E5748', // Soft sage green
-    accentColor: '#2D4236',
-    glowColor: '#6DA382',
-    frameColor: '#FAF4ED',
+    color: '#4E6F5E', // Refined Botanical Sage Green
+    accentColor: '#3B5749',
+    glowColor: '#84BFA3',
+    frameColor: '#FAF5F0',
     goldColor: '#E6CA7E',
     number: '03',
     description:
@@ -193,10 +184,10 @@ export const DOORS_DATA = [
     category: 'GRAPHIC DESIGN',
     title: 'Brand Identity & Visual Editorial',
     tagline: 'High-fashion editorial layouts, typography systems & luxury aesthetics',
-    color: '#8E4F42', // Muted terracotta orange
-    accentColor: '#743C31',
-    glowColor: '#DA7A65',
-    frameColor: '#FAF4ED',
+    color: '#8A5850', // Refined Warm Terracotta Rose
+    accentColor: '#6E433B',
+    glowColor: '#D89084',
+    frameColor: '#FAF5F0',
     goldColor: '#E6CA7E',
     number: '04',
     description:
@@ -495,9 +486,9 @@ function ArchedDoor3D({ door, index, isActive, onSelect, hoveredDoor, setHovered
       delta
     );
 
-    // Dynamic portal light intensity
+    // Dynamic portal light intensity (illuminates from inside only when opened)
     if (portalLightRef.current) {
-      const targetIntensity = isOpened ? 3.5 : isHovered ? 1.2 : 0.2;
+      const targetIntensity = isOpened ? 2.8 : 0;
       portalLightRef.current.intensity = THREE.MathUtils.damp(
         portalLightRef.current.intensity,
         targetIntensity,
@@ -543,13 +534,13 @@ function ArchedDoor3D({ door, index, isActive, onSelect, hoveredDoor, setHovered
           <primitive object={materials.portalGlowMat} attach="material" />
         </mesh>
 
-        {/* Portal Point Light */}
+        {/* Portal Point Light (recessed inside chamber behind door) */}
         <pointLight
           ref={portalLightRef}
-          position={[0, 1.3, 0.3]}
+          position={[0, 1.3, -0.05]}
           color={door.glowColor}
-          intensity={0.2}
-          distance={3.5}
+          intensity={0}
+          distance={4}
           decay={2}
         />
 
@@ -742,32 +733,6 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
       setActiveDoorId(null);
     } else {
       setActiveDoorId(doorId);
-      // AUTOMATED NAVIGATION: As the 3D arched door swings open on its hinge, smoothly glide the visitor directly inside to that domain's projects!
-      setTimeout(() => {
-        const chamberEl = document.getElementById('domain-projects-chamber');
-        if (chamberEl) {
-          chamberEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 520);
-    }
-  };
-
-  const scrollToDoors = () => {
-    const el = document.getElementById('doors-container');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
-  const scrollToProject = (targetCardId) => {
-    if (!targetCardId) return;
-    const targetEl = document.getElementById(targetCardId);
-    if (targetEl) {
-      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      targetEl.classList.add('highlight-pulse');
-      setTimeout(() => {
-        targetEl.classList.remove('highlight-pulse');
-      }, 2600);
     }
   };
 
@@ -829,10 +794,11 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
             shadows
             style={{ width: '100%', height: '520px' }}
           >
-            <ambientLight intensity={1.4} />
+            {/* Balanced Studio Lighting for Uniform Architectural Finish */}
+            <ambientLight intensity={1.5} color="#fff6f8" />
             <directionalLight
-              position={[5, 8, 6]}
-              intensity={2.2}
+              position={[0, 6, 6]}
+              intensity={1.8}
               castShadow
               shadow-mapSize={[1024, 1024]}
               shadow-camera-near={0.5}
@@ -842,8 +808,8 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
               shadow-camera-top={4}
               shadow-camera-bottom={-4}
             />
-            <pointLight position={[-4, 3, 2]} intensity={1.2} color="#f8cde5" />
-            <pointLight position={[4, 2, 2]} intensity={1.2} color="#e8d39a" />
+            <directionalLight position={[-4, 3, 4]} intensity={0.6} color="#faebf2" />
+            <directionalLight position={[4, 3, 4]} intensity={0.6} color="#fff7ee" />
 
             <DoorsCameraController activeDoorId={activeDoorId} mouse={mouse} />
 
@@ -881,7 +847,6 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
           ========================================================================= */}
       {activeDoor && (
         <div
-          id="domain-projects-chamber"
           className="door-chamber-reveal"
           style={{
             '--chamber-accent': activeDoor.glowColor,
@@ -898,15 +863,6 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
             </div>
             <div className="chamber-right">
               <button
-                type="button"
-                className="chamber-nav-btn"
-                onClick={scrollToDoors}
-                title="Return to 3D doors view"
-              >
-                ↑ Back to Doors
-              </button>
-              <button
-                type="button"
                 className="chamber-close-btn"
                 onClick={() => setActiveDoorId(null)}
                 aria-label="Close portal"
@@ -945,7 +901,6 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
                   <div className="chamber-actions">
                     {proj.caseStudyId && openCaseStudy ? (
                       <button
-                        type="button"
                         className="pill pill-primary pill-sm"
                         onClick={(e) => openCaseStudy(proj.caseStudyId, e.currentTarget)}
                       >
@@ -976,31 +931,10 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
                         GitHub <ArrowUpRight size={14} />
                       </a>
                     )}
-
-                    {proj.targetCardId && (
-                      <button
-                        type="button"
-                        className="pill pill-chamber-jump pill-sm"
-                        onClick={() => scrollToProject(proj.targetCardId)}
-                        title="Locate this project in the full showcase"
-                      >
-                        View in Showcase ↓
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Chamber Footer Bar */}
-          <div className="chamber-bottom-bar">
-            <button type="button" className="chamber-back-top-btn" onClick={scrollToDoors}>
-              <RotateCcw size={14} /> Return to 3D Arched Doors
-            </button>
-            <a href="#work" className="chamber-explore-all-btn">
-              Explore All Projects in Full Showcase ↓
-            </a>
           </div>
         </div>
       )}
