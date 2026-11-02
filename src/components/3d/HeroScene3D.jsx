@@ -305,10 +305,10 @@ export default function HeroScene3D() {
         <pointLight position={[-3, -2, 3]} intensity={2.0} color="#e06296" />
         <pointLight position={[3, 3, 2]} intensity={1.8} color="#ffd166" />
 
-        {/* Delicate Sakura Blossom accent floating gracefully top-right corner */}
+        {/* Delicate Sakura Blossom accent floating gracefully top-right */}
         <Float speed={2.0} rotationIntensity={0.4} floatIntensity={0.9}>
-          <group position={[3.4, 2.2, -0.4]}>
-            <Appealing3DFlower texture={flowerTexture} scale={0.48} rotationSpeed={0.25} mouse={mouse} />
+          <group position={[2.2, 1.2, 0.2]}>
+            <Appealing3DFlower texture={flowerTexture} scale={0.52} rotationSpeed={0.25} mouse={mouse} />
           </group>
         </Float>
 

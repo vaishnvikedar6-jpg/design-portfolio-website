@@ -33,7 +33,6 @@ import Skills3D from './components/3d/Skills3D';
 import Timeline3D from './components/3d/Timeline3D';
 import InteractiveCard3D from './components/3d/InteractiveCard3D';
 import ButterflyGuide from './components/3d/ButterflyGuide';
-import SpeakingAvatar3D from './components/3d/SpeakingAvatar3D';
 
 // Base-aware asset path: works on GitHub Pages sub-paths, Netlify, Vercel and Replit.
 const asset = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
@@ -439,8 +438,27 @@ function App() {
             <Blossom className="flower f2" />
             <Blossom className="flower f3" />
 
-            {/* Speaking 3D AI Female Avatar & Portrait Studio */}
-            <SpeakingAvatar3D openCaseStudy={openCaseStudy} />
+            {/* Dimensional Layered Portrait Card - Ultra Sharp & Crystal Clear */}
+            <InteractiveCard3D className="portrait-3d-glass-card" depth={16}>
+              <img
+                src={asset('hero-photo.png')}
+                alt="Vaishnavi Kedar smiling in a portrait with pink flowers"
+                width="580"
+                height="412"
+                fetchPriority="high"
+                decoding="sync"
+              />
+              {/* 3D Hackathon Award Badge */}
+              <div className="hero-3d-badge">
+                <div className="badge-trophy-icon">
+                  <Trophy size={18} />
+                </div>
+                <div>
+                  <strong>Top 6 of 193+</strong>
+                  <span>Drishti UI/UX Designathon Finalist</span>
+                </div>
+              </div>
+            </InteractiveCard3D>
           </div>
         </section>
 

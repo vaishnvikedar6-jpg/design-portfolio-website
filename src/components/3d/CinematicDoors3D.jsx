@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float } from '@react-three/drei';
 import * as THREE from 'three';
@@ -29,10 +29,10 @@ const externalProps = { target: '_blank', rel: 'noopener noreferrer' };
 // =========================================================================
 export const DOORS_DATA = [
   {
-    id: 'creative-world',
-    category: 'MY CREATIVE WORLD',
-    title: 'Creative Engineering & Interactive Art',
-    tagline: 'WebGL shaders, Three.js 3D environments, physics tilt & luxury editorial UI',
+    id: 'web-dev',
+    category: 'WEB DEVELOPMENT',
+    title: 'Web Systems & Cloud Infrastructure',
+    tagline: 'High-availability architectures, zero-downtime pipelines & production web systems',
     color: '#415B76', // Refined French Slate Navy
     accentColor: '#30455B',
     glowColor: '#7AA3D1',
@@ -40,8 +40,34 @@ export const DOORS_DATA = [
     goldColor: '#E6CA7E',
     number: '01',
     description:
-      'Immersive digital experiences crafted with real-time Three.js shaders, React Three Fiber, physics-based 3D tilt, and high-fashion luxury typography.',
+      'Engineered cloud deployments and production web applications built with Docker, Jenkins CI/CD pipelines, Python Flask, Gunicorn, and React.',
     projects: [
+      {
+        id: 'coursereg-cicd',
+        title: 'Course Registration CI/CD Platform',
+        badge: 'Live on Render',
+        excerpt:
+          'Enterprise academic registration engine with real-time seat tracking, database-enforced capacity constraints, and zero-downtime automated deployment orchestrated with Flask, Docker, Jenkins & Render.',
+        tags: ['CI/CD Pipeline', 'Docker & Jenkins', 'Flask 3.1 & Gunicorn', 'Live on Render'],
+        primaryLink: 'https://course-registration-dashboard.onrender.com/',
+        primaryLabel: 'Launch Live Platform',
+        githubLink: 'https://github.com/vaishnvikedar6-jpg',
+        image: 'coursereg-cicd.jpg',
+        targetCardId: 'project-coursereg',
+      },
+      {
+        id: 'cyberguard',
+        title: 'CyberGuard Security Suite',
+        badge: 'Oasis Infobyte Internship',
+        excerpt:
+          'Modern cybersecurity and vulnerability assessment landing interface designed with responsive system tokens and high-contrast accessibility.',
+        tags: ['Web Security', 'Frontend Engineering', 'Responsive Design'],
+        primaryLink: 'https://vaishnvikedar6-jpg.github.io/OIBSIP/Level1_Task1/',
+        primaryLabel: 'View Live Site',
+        githubLink: 'https://github.com/vaishnvikedar6-jpg',
+        image: 'cyberguard.jpg',
+        targetCardId: 'project-cyberguard',
+      },
       {
         id: '3d-portfolio',
         title: 'Immersive 3D Creative Portfolio',
@@ -54,18 +80,34 @@ export const DOORS_DATA = [
         image: 'portfolio-cover.jpg',
         targetCardId: 'project-portfolio',
       },
+    ],
+  },
+  {
+    id: 'app-dev',
+    category: 'APP DEVELOPMENT',
+    title: 'Mobile Architecture & Offline Systems',
+    tagline: 'Resilient mobile apps, offline telemetry & seamless user onboarding',
+    color: '#6B547C', // Refined Wisteria Plum Lavender
+    accentColor: '#533F62',
+    glowColor: '#B08DC9',
+    frameColor: '#FAF5F0',
+    goldColor: '#E6CA7E',
+    number: '02',
+    description:
+      'Purpose-built mobile applications designed for high-stress, low-connectivity environments and consumer micro-experiences.',
+    projects: [
       {
-        id: 'miss-beautiful',
-        title: 'Miss Beautiful Luxury Editorial',
-        badge: 'Web Editorial Design',
+        id: 'ayushlink',
+        title: 'AYUSHLINK-FINAL',
+        badge: 'Offline-First Health',
         excerpt:
-          '“Precision in Every Touch” — high-fashion luxury cosmetic brand identity, typography systems, and web editorial layout.',
-        tags: ['Luxury Branding', 'Editorial UI', 'Fashion Aesthetic'],
-        primaryLink:
-          'https://www.figma.com/proto/4z78d3naEOI0XzCR0oc4J7/AVIRA?node-id=12-790&t=FlMtIR4sxAwxxGSA-1',
-        primaryLabel: 'View Project Prototype',
-        image: 'miss-beautiful-1.png',
-        targetCardId: 'project-miss-beautiful',
+          'Offline-first medical record & patient clinic dashboard designed for low-connectivity regions. Connect with care, records, and support — online or offline, anywhere you are.',
+        tags: ['React', 'Offline-First PWA', 'Healthcare Telemetry', 'SQLite Cache'],
+        primaryLink: 'https://github.com/vaishnvikedar6-jpg/Ayushlink-Final',
+        primaryLabel: 'View Repository',
+        githubLink: 'https://github.com/vaishnvikedar6-jpg/Ayushlink-Final',
+        image: 'ayushlink.jpg',
+        targetCardId: 'project-ayushlink',
       },
       {
         id: 'smoothiefy',
@@ -82,45 +124,19 @@ export const DOORS_DATA = [
     ],
   },
   {
-    id: 'my-projects',
-    category: 'MY PROJECTS',
-    title: 'Production Platforms & Resilient Systems',
-    tagline: 'Enterprise automated CI/CD pipelines, offline healthcare telemetry & transit safety',
-    color: '#6B547C', // Refined Wisteria Plum Lavender
-    accentColor: '#533F62',
-    glowColor: '#B08DC9',
+    id: 'ui-ux',
+    category: 'UI/UX DESIGN',
+    title: 'Human-Centered Product Design',
+    tagline: 'Research-backed interfaces, transit safety innovations & design systems',
+    color: '#4E6F5E', // Refined Botanical Sage Green
+    accentColor: '#3B5749',
+    glowColor: '#84BFA3',
     frameColor: '#FAF5F0',
     goldColor: '#E6CA7E',
-    number: '02',
+    number: '03',
     description:
-      'Purpose-built production web platforms, automated Docker & Jenkins deployment pipelines, and high-resilience healthcare dashboards.',
+      'Award-winning product prototypes crafted with empathy, user psychology, meticulous design tokens, and rigorous designathon verification.',
     projects: [
-      {
-        id: 'coursereg-cicd',
-        title: 'Course Registration CI/CD Platform',
-        badge: 'Live on Render',
-        excerpt:
-          'Enterprise academic registration engine with real-time seat tracking, database-enforced capacity constraints, and zero-downtime automated deployment orchestrated with Flask, Docker, Jenkins & Render.',
-        tags: ['CI/CD Pipeline', 'Docker & Jenkins', 'Flask 3.1 & Gunicorn', 'Live on Render'],
-        primaryLink: 'https://course-registration-dashboard.onrender.com/',
-        primaryLabel: 'Launch Live Platform',
-        githubLink: 'https://github.com/vaishnvikedar6-jpg',
-        image: 'coursereg-cicd.jpg',
-        targetCardId: 'project-coursereg',
-      },
-      {
-        id: 'ayushlink',
-        title: 'AYUSHLINK-FINAL',
-        badge: 'Offline-First Health',
-        excerpt:
-          'Offline-first medical record & patient clinic dashboard designed for low-connectivity regions. Connect with care, records, and support — online or offline, anywhere you are.',
-        tags: ['React', 'Offline-First PWA', 'Healthcare Telemetry', 'SQLite Cache'],
-        primaryLink: 'https://github.com/vaishnvikedar6-jpg/Ayushlink-Final',
-        primaryLabel: 'View Repository',
-        githubLink: 'https://github.com/vaishnvikedar6-jpg/Ayushlink-Final',
-        image: 'ayushlink.jpg',
-        targetCardId: 'project-ayushlink',
-      },
       {
         id: 'avira',
         title: 'AVIRA Women Transit Safety Companion',
@@ -136,72 +152,38 @@ export const DOORS_DATA = [
         targetCardId: 'project-avira',
       },
       {
-        id: 'cyberguard',
-        title: 'CyberGuard Security Suite',
-        badge: 'Oasis Infobyte Internship',
+        id: 'civic-fix',
+        title: 'Civic Fix Smart Civic Reporter',
+        badge: 'PixelVerse UI/UX Hackathon',
         excerpt:
-          'Modern cybersecurity and vulnerability assessment landing interface designed with responsive system tokens and high-contrast accessibility.',
-        tags: ['Web Security', 'Frontend Engineering', 'Responsive Design'],
-        primaryLink: 'https://vaishnvikedar6-jpg.github.io/OIBSIP/Level1_Task1/',
-        primaryLabel: 'View Live Site',
-        githubLink: 'https://github.com/vaishnvikedar6-jpg',
-        image: 'cyberguard.jpg',
-        targetCardId: 'project-cyberguard',
+          'Citizen issue-reporting app making reporting potholes and broken utilities fast, trackable, and verifiable with voice and photo inputs.',
+        tags: ['Civic Tech', 'Accessibility', 'Mobile Prototype'],
+        primaryLink: 'https://www.figma.com/proto/7ua1fjJwYSe9NK58SMV0k3/civic_fix?node-id=29-104',
+        primaryLabel: 'Figma Prototype',
+        caseStudyId: 'civic-fix',
+        image: 'civic-fix-1.png',
+        targetCardId: 'project-civic-fix',
+      },
+      {
+        id: 'aura',
+        title: 'Aura Women Wellness Companion',
+        badge: 'Wellness UI Concept',
+        excerpt:
+          'Serene, empathetic wellness app tailored for women cycle and mental well-being tracking, utilizing calming plum tones and friendly micro-interactions.',
+        tags: ['Wellness UX', 'Mobile UI', 'Figma'],
+        primaryLink:
+          'https://www.figma.com/proto/Ampa8dUqHSzoXFItj7pm28/Untitled?node-id=1-3&starting-point-node-id=1%3A3',
+        primaryLabel: 'Explore in Figma',
+        image: 'aura-1.png',
+        targetCardId: 'project-aura',
       },
     ],
   },
   {
-    id: 'my-journey',
-    category: 'MY JOURNEY',
-    title: 'Academic Foundations & Engineering Path',
-    tagline: 'B.E. in Computer Engineering at SIES GST, internships & leadership milestones',
-    color: '#4E6F5E', // Refined Botanical Sage Green
-    accentColor: '#3B5749',
-    glowColor: '#84BFA3',
-    frameColor: '#FAF5F0',
-    goldColor: '#E6CA7E',
-    number: '03',
-    description:
-      'Rigorous academic foundations in Computer Engineering, practical software engineering internships, and continuous technical exploration.',
-    projects: [
-      {
-        id: 'sies-gst',
-        title: 'SIES Graduate School of Technology',
-        badge: 'B.E. Computer Engineering (2022–2026)',
-        excerpt:
-          'Pursuing B.E. in Computer Engineering with an exceptional 9.86 CGPA academic record. Specializing in data structures, systems engineering, cloud deployment, and UI/UX design.',
-        tags: ['9.86 CGPA', 'Computer Engineering', 'SIES GST', 'Algorithms'],
-        primaryLink: '#journey',
-        primaryLabel: 'View Education Timeline',
-      },
-      {
-        id: 'oasis-internship',
-        title: 'Oasis Infobyte — Web Development Intern',
-        badge: 'Internship (June 2024–July 2024)',
-        excerpt:
-          'Engineered responsive web security landing interfaces and interactive client-side web applications with clean token architecture and cross-browser accessibility.',
-        tags: ['Web Dev Intern', 'Frontend Engineering', 'UI Architecture'],
-        primaryLink: 'https://vaishnvikedar6-jpg.github.io/OIBSIP/Level1_Task1/',
-        primaryLabel: 'View Internship Work',
-        githubLink: 'https://github.com/vaishnvikedar6-jpg',
-      },
-      {
-        id: 'academic-honors',
-        title: 'Holy Cross High School & Model College',
-        badge: 'Academic Distinction Honors',
-        excerpt:
-          'Achieved 93.40% in Secondary School Certificate (SSC) and 89.20% in Higher Secondary Certificate (HSC) in Science, building strong analytical and mathematical rigor.',
-        tags: ['SSC 93.4%', 'HSC 89.2%', 'Distinction Honors'],
-        primaryLink: '#journey',
-        primaryLabel: 'View High School Record',
-      },
-    ],
-  },
-  {
-    id: 'my-achievements',
-    category: 'MY ACHIEVEMENTS',
-    title: 'Honors, Hackathons & Design Competitions',
-    tagline: 'Top 6 Drishti Designathon Finalist, PixelVerse Hackathon & Academic Honors',
+    id: 'graphic-design',
+    category: 'GRAPHIC DESIGN',
+    title: 'Brand Identity & Visual Editorial',
+    tagline: 'High-fashion editorial layouts, typography systems & luxury aesthetics',
     color: '#8A5850', // Refined Warm Terracotta Rose
     accentColor: '#6E433B',
     glowColor: '#D89084',
@@ -209,41 +191,31 @@ export const DOORS_DATA = [
     goldColor: '#E6CA7E',
     number: '04',
     description:
-      'Award-winning product prototypes crafted in high-stakes designathons, civic tech hackathons, and certified cloud and frontend competencies.',
+      'High-fashion editorial layouts, luxury cosmetic branding, visual systems, and typographic compositions crafted with botanical elegance.',
     projects: [
       {
-        id: 'drishti-achievement',
-        title: 'Drishti UI/UX Designathon Finalist',
-        badge: 'Top 6 of 193+ Teams Nationwide',
+        id: 'miss-beautiful',
+        title: 'Miss Beautiful Luxury Editorial',
+        badge: 'Web Editorial Design',
         excerpt:
-          'Finalist among 193+ competing teams in the prestigious Drishti Designathon hosted by CESA VIT Mumbai. Designed AVIRA transit companion with real-time safety scores and SOS workflows.',
-        tags: ['Drishti Top 6', 'CESA VIT Mumbai', 'AVIRA Designathon'],
-        caseStudyId: 'avira',
+          '“Precision in Every Touch” — high-fashion luxury cosmetic brand identity, typography systems, and web editorial layout.',
+        tags: ['Luxury Branding', 'Editorial UI', 'Fashion Aesthetic'],
+        primaryLink:
+          'https://www.figma.com/proto/4z78d3naEOI0XzCR0oc4J7/AVIRA?node-id=12-790&t=FlMtIR4sxAwxxGSA-1',
+        primaryLabel: 'View Project Prototype',
+        image: 'miss-beautiful-1.png',
+        targetCardId: 'project-miss-beautiful',
+      },
+      {
+        id: 'design-artifacts',
+        title: 'Curated Interface Artifacts & Typography Studies',
+        badge: 'Design System & Typography',
+        excerpt:
+          'Dimensional collection of design systems, user flows, and product architectures crafted with empathy, precision, and botanical harmony.',
+        tags: ['Design Systems', 'Typography', 'Figma Tokens'],
         primaryLink: '#work',
-        primaryLabel: 'Read Drishti Case Study',
-        targetCardId: 'project-avira',
-      },
-      {
-        id: 'pixelverse-achievement',
-        title: 'PixelVerse UI/UX Hackathon Finalist',
-        badge: 'Civic Tech Innovation',
-        excerpt:
-          'Recognized for Civic Fix, a rapid crowd-verified issue reporting app that makes municipal infrastructure reporting fast, verifiable, and accessible with photo and voice inputs.',
-        tags: ['Hackathon Finalist', 'GDG SIES GST', 'Civic Tech'],
-        caseStudyId: 'civic-fix',
-        primaryLink: 'https://www.figma.com/proto/7ua1fjJwYSe9NK58SMV0k3/civic_fix?node-id=29-104',
-        primaryLabel: 'Explore Hackathon Prototype',
-        targetCardId: 'project-civic-fix',
-      },
-      {
-        id: 'academic-merit',
-        title: '9.86 CGPA Top Academic Distinction',
-        badge: 'Top University Merit',
-        excerpt:
-          'Maintained consistent top semester ranking across Computer Engineering coursework with distinction in system design, database management, and UI architecture.',
-        tags: ['9.86 CGPA', 'Academic Distinction', 'Computer Engineering'],
-        primaryLink: '#journey',
-        primaryLabel: 'Inspect Academic Record',
+        primaryLabel: 'Inspect Gallery',
+        targetCardId: 'project-miss-beautiful',
       },
     ],
   },
@@ -371,15 +343,7 @@ function createNameplateTexture(text, subtext) {
 // =========================================================================
 // 3. INDIVIDUAL 3D ARCHED DOOR COMPONENT
 // =========================================================================
-function ArchedDoor3D({
-  door,
-  index,
-  isActive,
-  isIntroPreview = false,
-  onSelect,
-  hoveredDoor,
-  setHoveredDoor,
-}) {
+function ArchedDoor3D({ door, index, isActive, onSelect, hoveredDoor, setHoveredDoor }) {
   const hingeGroupRef = useRef();
   const rootGroupRef = useRef();
   const portalLightRef = useRef();
@@ -495,19 +459,18 @@ function ArchedDoor3D({
 
     // Calculate target hinge angle:
     // When opened: swings open into the room at -76 degrees (-1.33 rad)
-    // When in sequential magical intro: cracks open to -32 deg (-0.56 rad) emitting beam of light
     // When hovered (unopened): cracks open slightly (-0.09 rad ~ 5 degrees) as an invitation
     // When closed: 0 rad
-    const targetHingeY = isOpened ? -1.33 : isIntroPreview ? -0.56 : isHovered ? -0.09 : 0;
+    const targetHingeY = isOpened ? -1.33 : isHovered ? -0.09 : 0;
     hingeGroupRef.current.rotation.y = THREE.MathUtils.damp(
       hingeGroupRef.current.rotation.y,
       targetHingeY,
-      6.5,
+      7,
       delta
     );
 
     // Root Group subtle hover elevation
-    const targetZ = isOpened ? basePosition.z + 0.12 : isIntroPreview ? basePosition.z + 0.1 : isHovered ? basePosition.z + 0.15 : basePosition.z;
+    const targetZ = isOpened ? basePosition.z + 0.12 : isHovered ? basePosition.z + 0.15 : basePosition.z;
     const targetY = isOpened ? basePosition.y + 0.04 : isHovered ? basePosition.y + 0.05 : basePosition.y;
 
     rootGroupRef.current.position.z = THREE.MathUtils.damp(
@@ -523,9 +486,9 @@ function ArchedDoor3D({
       delta
     );
 
-    // Dynamic portal light intensity (illuminates from inside when opened or during magical intro preview)
+    // Dynamic portal light intensity (illuminates from inside only when opened)
     if (portalLightRef.current) {
-      const targetIntensity = isOpened ? 2.8 : isIntroPreview ? 2.2 : 0;
+      const targetIntensity = isOpened ? 2.8 : 0;
       portalLightRef.current.intensity = THREE.MathUtils.damp(
         portalLightRef.current.intensity,
         targetIntensity,
@@ -746,29 +709,7 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
   const [activeDoorId, setActiveDoorId] = useState(null); // Show panoramic view of all 4 doors first!
   const [hoveredDoor, setHoveredDoor] = useState(null);
   const [webGLSupported, setWebGLSupported] = useState(true);
-  const [introPreviewDoor, setIntroPreviewDoor] = useState(null);
-  const [isIntroRunning, setIsIntroRunning] = useState(false);
-  const hasTriggeredIntro = useRef(false);
   const mouse = useRef({ x: 0, y: 0 });
-
-  const triggerMagicalOpeningSequence = useCallback(() => {
-    setIsIntroRunning(true);
-    const sequence = [
-      { door: 0, delay: 100 },
-      { door: 1, delay: 850 },
-      { door: 2, delay: 1600 },
-      { door: 3, delay: 2350 },
-    ];
-    sequence.forEach(({ door, delay }) => {
-      setTimeout(() => {
-        setIntroPreviewDoor(door);
-      }, delay);
-    });
-    setTimeout(() => {
-      setIntroPreviewDoor(null);
-      setIsIntroRunning(false);
-    }, 3200);
-  }, []);
 
   useEffect(() => {
     setWebGLSupported(isWebGLAvailable());
@@ -779,69 +720,19 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-
-    // Viewport enter observer for 1-time automatic magical opening sequence
-    const el = document.getElementById('doors-container');
-    let observer;
-    if (el && typeof IntersectionObserver !== 'undefined') {
-      observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && !hasTriggeredIntro.current) {
-              hasTriggeredIntro.current = true;
-              const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-              if (!prefersReduced) {
-                triggerMagicalOpeningSequence();
-              }
-            }
-          });
-        },
-        { threshold: 0.22 }
-      );
-      observer.observe(el);
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (observer) observer.disconnect();
-    };
-  }, [triggerMagicalOpeningSequence]);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   const activeDoor = useMemo(() => {
     return DOORS_DATA.find((d) => d.id === activeDoorId) || null;
   }, [activeDoorId]);
 
   const handleSelectDoor = (doorId) => {
-    setIntroPreviewDoor(null); // Cancel intro preview on direct selection
     if (activeDoorId === doorId) {
+      // Toggle close
       setActiveDoorId(null);
     } else {
       setActiveDoorId(doorId);
-      setTimeout(() => {
-        const chamberEl = document.getElementById('domain-projects-chamber');
-        if (chamberEl) {
-          chamberEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 520);
-    }
-  };
-
-  const scrollToDoors = () => {
-    const el = document.getElementById('doors-container');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
-  const scrollToProject = (targetCardId) => {
-    if (!targetCardId) return;
-    const targetEl = document.getElementById(targetCardId);
-    if (targetEl) {
-      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      targetEl.classList.add('highlight-pulse');
-      setTimeout(() => {
-        targetEl.classList.remove('highlight-pulse');
-      }, 2600);
     }
   };
 
@@ -881,19 +772,6 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
               </button>
             );
           })}
-
-          <button
-            type="button"
-            className={`door-pill-btn replay-magic-btn ${isIntroRunning ? 'active' : ''}`}
-            onClick={() => {
-              setActiveDoorId(null);
-              triggerMagicalOpeningSequence();
-            }}
-            title="Replay the magical entrance opening sequence"
-          >
-            <Sparkles size={14} /> Replay Magic Sequence
-          </button>
-
           {activeDoorId && (
             <button
               className="door-pill-btn close-all"
@@ -942,7 +820,6 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
                 door={door}
                 index={idx}
                 isActive={activeDoorId === door.id}
-                isIntroPreview={introPreviewDoor === idx}
                 hoveredDoor={hoveredDoor}
                 setHoveredDoor={setHoveredDoor}
                 onSelect={handleSelectDoor}
@@ -970,7 +847,6 @@ export default function CinematicDoors3D({ openCaseStudy, LINKS }) {
           ========================================================================= */}
       {activeDoor && (
         <div
-          id="domain-projects-chamber"
           className="door-chamber-reveal"
           style={{
             '--chamber-accent': activeDoor.glowColor,
