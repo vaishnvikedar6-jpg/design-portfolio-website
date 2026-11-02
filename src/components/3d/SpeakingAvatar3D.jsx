@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect, useCallback, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useGLTF, useAnimations } from '@react-three/drei';
+import { useGLTF, useAnimations, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import {
   Volume2,
@@ -11,7 +11,6 @@ import {
   Sparkles,
   Camera,
   Bot,
-  Trophy,
   MessageCircle,
 } from 'lucide-react';
 import { isWebGLAvailable } from './HeroScene3D';
@@ -64,12 +63,13 @@ export const FULL_SCRIPT_TEXT = INTRO_SCRIPT_SEGMENTS.map((s) => s.text).join(' 
 
 // =========================================================================
 // 1. EXACT REFERENCE 3D DIGITAL HUMAN FEMALE PRESENTER
-// Short dark brown bob, light pastel pink blazer, white inner top, gold earrings
+// Dark brown side-parted bob, light pastel pink blazer, white inner top, gold earrings
+// MeshPhysicalMaterial with Sheen for tailored fabric, clearcoat for glossy hair & eyes
 // =========================================================================
 function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse }) {
   const avatarGroupRef = useRef();
 
-  // Load avatar matching short side-part bob hairstyle and tailored blazer
+  // Load rigged human presenter and mocap animations
   const { scene, nodes } = useGLTF(asset('avatar_vaishnavi_presenter.glb'));
   const { animations } = useGLTF(asset('animations.glb'));
   const { actions } = useAnimations(animations, avatarGroupRef);
@@ -79,7 +79,7 @@ function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse 
 
   // Exact Visual Styling matching the uploaded reference image:
   // - Dark brown bob hairstyle with side partition
-  // - Light pastel pink tailored blazer
+  // - Light pastel pink tailored blazer with sheen micro-fiber fabric rolloff
   // - White inner crewneck top
   // - Natural dewy human skin & friendly soft smile
   // - Hide extraneous accessories (e.g. glasses)
@@ -91,32 +91,36 @@ function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse 
         child.castShadow = true;
         child.receiveShadow = true;
 
-        // Hide glasses - reference has no glasses
+        // Hide glasses - reference character has no glasses
         if (child.name === 'Wolf3D_Glasses') {
           child.visible = false;
           return;
         }
 
         if (child.material) {
-          // 1. Hair: Elegant dark brown / rich brunette bob with side partition
+          // 1. Hair: Elegant dark brown bob with side partition & silky anisotropic sheen
           if (child.name === 'Wolf3D_Hair') {
             const origNormal = child.material.normalMap;
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#32221b'), // Dark chestnut brown matching reference
-              roughness: 0.52,
-              metalness: 0.08,
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: new THREE.Color('#2e1e17'), // Rich dark brunette matching reference
+              roughness: 0.46,
+              metalness: 0.05,
+              clearcoat: 0.35,
+              clearcoatRoughness: 0.25,
               normalMap: origNormal,
-              roughnessMap: child.material.roughnessMap,
             });
           }
 
-          // 2. Blazer: Tailored light pastel pink blazer
+          // 2. Blazer: Tailored light pastel pink blazer with luxury sheen fabric rolloff
           if (child.name === 'Wolf3D_Outfit_Top') {
             const origNormal = child.material.normalMap;
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#f8c8dc'), // Light pastel pink blazer
-              roughness: 0.65,
-              metalness: 0.04,
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: new THREE.Color('#f7c8d8'), // Soft pastel pink blazer
+              roughness: 0.68,
+              metalness: 0.02,
+              sheen: 0.75,
+              sheenColor: new THREE.Color('#fff0f5'),
+              sheenRoughness: 0.45,
               normalMap: origNormal,
             });
           }
@@ -128,10 +132,16 @@ function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse 
             child.material.roughness = 0.72;
           }
 
-          // 4. Face & Skin: Soft natural human complexion with dewy glow
+          // 4. Face & Skin: Soft natural human complexion with warm subsurface rolloff
           if (child.name === 'Wolf3D_Head' || child.name === 'Wolf3D_Body') {
-            child.material.roughness = 0.54;
-            child.material.metalness = 0.03;
+            child.material.roughness = 0.52;
+            child.material.metalness = 0.0;
+          }
+
+          // 5. Eyes: Clear corneal specular reflection & depth
+          if (child.name === 'EyeLeft' || child.name === 'EyeRight') {
+            child.material.roughness = 0.08;
+            child.material.metalness = 0.0;
           }
         }
       }
@@ -316,7 +326,7 @@ function PresenterLoadingFallback() {
   return (
     <div className="seamless-loading-state" aria-hidden="true">
       <div className="loading-flower-spinner" />
-      <span>Summoning Vaishnavi's Presenter...</span>
+      <span>Welcoming Vaishnavi's Presenter...</span>
     </div>
   );
 }
@@ -330,7 +340,8 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
   const [isMuted, setIsMuted] = useState(false);
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
   const [speechSupported, setSpeechSupported] = useState(true);
-  const [voicesLoaded, setVoicesLoaded] = useState(false);
+  const [showAutoStartHint, setShowAutoStartHint] = useState(false);
+  const [hasStartedIntroOnce, setHasStartedIntroOnce] = useState(false);
 
   const utteranceRef = useRef(null);
   const segmentTimerRef = useRef(null);
@@ -351,87 +362,19 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
     return preferred || voices.find((v) => v.lang.startsWith('en')) || voices[0];
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      setSpeechSupported(true);
-      const updateVoices = () => {
-        setVoicesLoaded(true);
-      };
-      window.speechSynthesis.onvoiceschanged = updateVoices;
-      updateVoices();
-    } else {
-      setSpeechSupported(false);
-    }
-
-    const handleMouseMove = (e) => {
-      mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
-    };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-      clearTimeout(segmentTimerRef.current);
-    };
-  }, []);
-
   // Synchronized Segment Sequence Handler
   const startSpeechSequence = useCallback(
     (startIndex = 0) => {
-      if (typeof window === 'undefined' || !window.speechSynthesis) return;
+      setHasStartedIntroOnce(true);
+      setShowAutoStartHint(false);
 
-      window.speechSynthesis.cancel();
+      if (typeof window === 'undefined') return;
+
       clearTimeout(segmentTimerRef.current);
-
       setCurrentSegmentIndex(startIndex);
       setIsPlaying(true);
 
-      const textToSpeak = INTRO_SCRIPT_SEGMENTS.slice(startIndex)
-        .map((s) => s.text)
-        .join(' ');
-
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      utterance.voice = getPreferredVoice();
-      utterance.pitch = 1.05; // Slightly youthful, friendly pitch
-      utterance.rate = 0.95; // Clear, articulate cadence
-
-      if (isMuted) {
-        utterance.volume = 0;
-      } else {
-        utterance.volume = 1;
-      }
-
-      // Word boundary event for tight subtitle synchronization
-      utterance.onboundary = (event) => {
-        if (event.name === 'sentence' || event.name === 'word') {
-          const charIndex = event.charIndex;
-          let accumulated = 0;
-          for (let i = startIndex; i < INTRO_SCRIPT_SEGMENTS.length; i++) {
-            accumulated += INTRO_SCRIPT_SEGMENTS[i].text.length + 1;
-            if (charIndex < accumulated) {
-              setCurrentSegmentIndex(i);
-              break;
-            }
-          }
-        }
-      };
-
-      utterance.onend = () => {
-        setIsPlaying(false);
-        setCurrentSegmentIndex(0);
-      };
-
-      utterance.onerror = () => {
-        setIsPlaying(false);
-      };
-
-      utteranceRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
-
-      // Timed fallback in case boundary events are not supported on this platform
+      // Animation & subtitle timing works reliably even if speech synthesis is unavailable or muted
       let cumulativeTime = 0;
       for (let i = startIndex; i < INTRO_SCRIPT_SEGMENTS.length; i++) {
         const segIndex = i;
@@ -443,15 +386,116 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
         }, cumulativeTime);
         cumulativeTime += dur;
       }
+
+      // Automatically end speaking after final segment
+      const totalRemainingDur = INTRO_SCRIPT_SEGMENTS.slice(startIndex).reduce(
+        (sum, s) => sum + s.duration,
+        0
+      );
+      setTimeout(() => {
+        setIsPlaying(false);
+        setCurrentSegmentIndex(0);
+      }, totalRemainingDur);
+
+      // If Web Speech API is available, play audio voice
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+
+        const textToSpeak = INTRO_SCRIPT_SEGMENTS.slice(startIndex)
+          .map((s) => s.text)
+          .join(' ');
+
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.voice = getPreferredVoice();
+        utterance.pitch = 1.05; // Slightly youthful, friendly pitch
+        utterance.rate = 0.95; // Clear, articulate cadence
+        utterance.volume = isMuted ? 0 : 1;
+
+        utterance.onboundary = (event) => {
+          if (event.name === 'sentence' || event.name === 'word') {
+            const charIndex = event.charIndex;
+            let accumulated = 0;
+            for (let i = startIndex; i < INTRO_SCRIPT_SEGMENTS.length; i++) {
+              accumulated += INTRO_SCRIPT_SEGMENTS[i].text.length + 1;
+              if (charIndex < accumulated) {
+                setCurrentSegmentIndex(i);
+                break;
+              }
+            }
+          }
+        };
+
+        utterance.onend = () => {
+          setIsPlaying(false);
+          setCurrentSegmentIndex(0);
+        };
+
+        utterance.onerror = () => {
+          // If audio gets blocked, animation continues smoothly with subtitles
+        };
+
+        utteranceRef.current = utterance;
+        try {
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          // Fallback graceful
+        }
+      }
     },
     [getPreferredVoice, isMuted, isPlaying]
   );
 
-  const togglePlay = () => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+  // Automatic Introduction on Website Load + One-time Audio Interaction Listener
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      setSpeechSupported(true);
+      window.speechSynthesis.onvoiceschanged = () => {};
+    } else {
+      setSpeechSupported(false);
+    }
 
+    const handleMouseMove = (e) => {
+      mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    };
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+
+    // One-time interaction trigger: when the user first clicks, taps, or scrolls, automatically start speech if not yet started
+    const triggerAudioOnFirstGesture = () => {
+      if (!hasStartedIntroOnce) {
+        startSpeechSequence(0);
+      }
+      window.removeEventListener('pointerdown', triggerAudioOnFirstGesture);
+      window.removeEventListener('keydown', triggerAudioOnFirstGesture);
+    };
+
+    window.addEventListener('pointerdown', triggerAudioOnFirstGesture, { once: true });
+    window.addEventListener('keydown', triggerAudioOnFirstGesture, { once: true });
+
+    // Show auto-start prompt if not yet triggered after 2 seconds
+    const hintTimer = setTimeout(() => {
+      if (!hasStartedIntroOnce && !isPlaying) {
+        setShowAutoStartHint(true);
+      }
+    }, 2200);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('pointerdown', triggerAudioOnFirstGesture);
+      window.removeEventListener('keydown', triggerAudioOnFirstGesture);
+      clearTimeout(hintTimer);
+      clearTimeout(segmentTimerRef.current);
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [hasStartedIntroOnce, isPlaying, startSpeechSequence]);
+
+  const togglePlay = () => {
     if (isPlaying) {
-      window.speechSynthesis.cancel();
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
       clearTimeout(segmentTimerRef.current);
       setIsPlaying(false);
     } else {
@@ -483,7 +527,7 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
           onClick={() => setActiveTab('avatar')}
           aria-label="Switch to 3D Virtual Human Presenter"
         >
-          <Bot size={14} /> <span>3D Virtual Presenter</span>
+          <Bot size={13} /> <span>3D Virtual Presenter</span>
           <span className="live-sparkle-dot" />
         </button>
         <button
@@ -498,7 +542,7 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
           }}
           aria-label="Switch to Portrait Photograph"
         >
-          <Camera size={14} /> <span>Portrait Photo</span>
+          <Camera size={13} /> <span>Portrait Photo</span>
         </button>
       </div>
 
@@ -513,25 +557,33 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
             {isWebGLAvailable() ? (
               <Canvas
                 camera={{ position: [0.10, 0.26, 2.44], fov: 34 }}
-                gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+                gl={{
+                  antialias: true,
+                  alpha: true,
+                  powerPreference: 'high-performance',
+                  toneMapping: THREE.ACESFilmicToneMapping,
+                  toneMappingExposure: 1.08,
+                }}
                 dpr={[1, 1.5]}
                 shadows
                 style={{ width: '100%', height: '100%' }}
               >
                 <PresenterCameraController />
-                {/* Cinematic Studio 3-Point Lighting */}
-                <ambientLight intensity={1.5} color="#fff6f8" />
+
+                {/* Studio 3-Point Lighting with ACES Filmic Tone Mapping */}
+                <hemisphereLight skyColor="#ffffff" groundColor="#ffd9e2" intensity={1.1} />
+                <ambientLight intensity={1.4} color="#fff6f8" />
                 <directionalLight
                   position={[2.5, 3.8, 3]}
-                  intensity={2.1}
+                  intensity={2.2}
                   castShadow
                   shadow-mapSize={[1024, 1024]}
                 />
                 {/* Soft blush pink fill light */}
                 <directionalLight position={[-3, 1.8, 2.2]} intensity={1.0} color="#fae8f0" />
                 {/* Hair and shoulder rim highlight */}
-                <pointLight position={[0, 2.6, -2.2]} intensity={1.3} color="#ffd4e2" />
-                <pointLight position={[0, 0.2, 1.4]} intensity={0.6} color="#ffffff" />
+                <pointLight position={[0, 2.6, -2.2]} intensity={1.4} color="#ffd4e2" />
+                <pointLight position={[0.1, 0.4, 1.6]} intensity={0.5} color="#ffffff" />
 
                 <Suspense fallback={null}>
                   <ExactReferencePresenter3D
@@ -561,20 +613,22 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
               )}
             </div>
 
-            {/* Top 6 Drishti Award Floating Badge */}
-            <div className="hero-3d-badge presenter-award-badge">
-              <div className="badge-trophy-icon">
-                <Trophy size={16} />
+            {/* Subtle One-Time Auto-Start Audio Prompt */}
+            {showAutoStartHint && !isPlaying && (
+              <div
+                className="auto-start-audio-pill"
+                onClick={() => startSpeechSequence(0)}
+                role="button"
+                tabIndex={0}
+              >
+                <Sparkles size={13} />
+                <span>Tap to hear voice introduction</span>
               </div>
-              <div>
-                <strong>Top 6 of 193+</strong>
-                <span>Drishti UI/UX Finalist</span>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* =========================================================================
-              2. VOICE CONTROLS & SYNCHRONIZED SUBTITLES (FLOATING BELOW PRESENTER)
+              2. MINIMAL PINK & WHITE CONTROLS & SUBTITLES (FLOATING BELOW PRESENTER)
               ========================================================================= */}
           <div className="presenter-floating-deck">
             <div className="avatar-voice-actions">
@@ -584,10 +638,10 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
                 onClick={togglePlay}
                 aria-label={isPlaying ? 'Pause speech introduction' : 'Meet Vaishnavi Voice Introduction'}
               >
-                {isPlaying ? <Pause size={17} /> : <Play size={17} />}
-                <span>{isPlaying ? 'Pause Introduction' : 'Meet Vaishnavi (Voice Intro)'}</span>
+                {isPlaying ? <Pause size={15} /> : <Play size={15} />}
+                <span>{isPlaying ? 'Pause Intro' : 'Meet Vaishnavi (Voice Intro)'}</span>
                 <span className="meet-sparkle">
-                  <Sparkles size={14} />
+                  <Sparkles size={13} />
                 </span>
               </button>
 
@@ -598,7 +652,7 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
                 title="Replay speech introduction from start"
                 aria-label="Replay introduction"
               >
-                <RotateCcw size={15} />
+                <RotateCcw size={14} />
               </button>
 
               <button
@@ -608,7 +662,7 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
                 title={isMuted ? 'Unmute voice' : 'Mute voice'}
                 aria-label={isMuted ? 'Unmute voice' : 'Mute voice'}
               >
-                {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
               </button>
             </div>
 
@@ -616,7 +670,7 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
             <div className="avatar-subtitles-capsule" role="region" aria-live="polite">
               <div className="subtitles-header">
                 <span className="subtitles-label">
-                  <MessageCircle size={12} /> AI Speech Subtitles
+                  <MessageCircle size={11} /> AI Speech Subtitles
                 </span>
                 <span className="subtitles-counter">
                   {currentSegmentIndex + 1} / {INTRO_SCRIPT_SEGMENTS.length}
@@ -642,16 +696,6 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
               className="hero-portrait-img"
             />
             <div className="hero-photo-gradient-overlay" />
-
-            <div className="hero-3d-badge">
-              <div className="badge-trophy-icon">
-                <Trophy size={16} />
-              </div>
-              <div>
-                <strong>Top 6 of 193+</strong>
-                <span>Drishti UI/UX Finalist</span>
-              </div>
-            </div>
           </div>
         </InteractiveCard3D>
       )}
