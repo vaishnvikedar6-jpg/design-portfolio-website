@@ -12,7 +12,6 @@ import {
   Camera,
   Bot,
   Trophy,
-  Heart,
   MessageCircle,
 } from 'lucide-react';
 import { isWebGLAvailable } from './HeroScene3D';
@@ -64,54 +63,82 @@ export const INTRO_SCRIPT_SEGMENTS = [
 export const FULL_SCRIPT_TEXT = INTRO_SCRIPT_SEGMENTS.map((s) => s.text).join(' ');
 
 // =========================================================================
-// 1. HIGH-QUALITY REALISTIC 3D HUMAN FEMALE AVATAR PRESENTER
-// Rigged GLB Model with ARKit/Oculus Visemes, Blinking, Gestures & MoCap
+// 1. EXACT REFERENCE 3D DIGITAL HUMAN FEMALE PRESENTER
+// Short dark brown bob, light pastel pink blazer, white inner top, gold earrings
 // =========================================================================
-function RealisticHumanAvatar3D({ isSpeaking, isMuted, activeAnimName, mouse }) {
+function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse }) {
   const avatarGroupRef = useRef();
 
-  // Load rigged human avatar and mocap animations
-  const { scene, nodes } = useGLTF(asset('avatar_female_rpm.glb'));
+  // Load avatar matching short side-part bob hairstyle and tailored blazer
+  const { scene, nodes } = useGLTF(asset('avatar_vaishnavi_presenter.glb'));
   const { animations } = useGLTF(asset('animations.glb'));
   const { actions } = useAnimations(animations, avatarGroupRef);
 
-  // Blinking cadence state
   const blinkTimer = useRef(0);
   const currentActionRef = useRef(null);
 
-  // Apply delicate blush pink/cream styling to outfit and realistic PBR materials
+  // Exact Visual Styling matching the uploaded reference image:
+  // - Dark brown bob hairstyle with side partition
+  // - Light pastel pink tailored blazer
+  // - White inner crewneck top
+  // - Natural dewy human skin & friendly soft smile
+  // - Hide extraneous accessories (e.g. glasses)
   useEffect(() => {
     if (!scene) return;
+
     scene.traverse((child) => {
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
 
-        if (child.material) {
-          // Soften roughness for a luxurious silk/fabric finish
-          child.material.roughness = Math.min(child.material.roughness ?? 0.6, 0.62);
-          child.material.metalness = Math.max(child.material.metalness ?? 0.05, 0.06);
+        // Hide glasses - reference has no glasses
+        if (child.name === 'Wolf3D_Glasses') {
+          child.visible = false;
+          return;
+        }
 
-          // Tint outfit to bespoke pastel blush pink / cream
-          if (
-            child.name === 'Wolf3D_Outfit_Top' ||
-            child.name === 'Wolf3D_Outfit_Bottom' ||
-            child.name.toLowerCase().includes('outfit')
-          ) {
-            child.material = child.material.clone();
-            child.material.color.set('#fde2eb');
+        if (child.material) {
+          // 1. Hair: Elegant dark brown / rich brunette bob with side partition
+          if (child.name === 'Wolf3D_Hair') {
+            const origNormal = child.material.normalMap;
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#32221b'), // Dark chestnut brown matching reference
+              roughness: 0.52,
+              metalness: 0.08,
+              normalMap: origNormal,
+              roughnessMap: child.material.roughnessMap,
+            });
           }
 
-          // Ensure skin has natural warm dewy tones
-          if (child.name === 'Wolf3D_Skin' || child.name === 'Wolf3D_Head') {
+          // 2. Blazer: Tailored light pastel pink blazer
+          if (child.name === 'Wolf3D_Outfit_Top') {
+            const origNormal = child.material.normalMap;
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#f8c8dc'), // Light pastel pink blazer
+              roughness: 0.65,
+              metalness: 0.04,
+              normalMap: origNormal,
+            });
+          }
+
+          // 3. Trousers / Bottom: Elegant blush cream tailored trousers
+          if (child.name === 'Wolf3D_Outfit_Bottom') {
+            child.material = child.material.clone();
+            child.material.color.set('#fae8f0');
+            child.material.roughness = 0.72;
+          }
+
+          // 4. Face & Skin: Soft natural human complexion with dewy glow
+          if (child.name === 'Wolf3D_Head' || child.name === 'Wolf3D_Body') {
             child.material.roughness = 0.54;
+            child.material.metalness = 0.03;
           }
         }
       }
     });
   }, [scene]);
 
-  // Coordinated Skeletal MoCap Animations: Idle vs. Natural Talking Gestures
+  // Smooth MoCap Animation Transitions (Idle vs Talking Gestures)
   useEffect(() => {
     if (!actions) return;
 
@@ -120,14 +147,14 @@ function RealisticHumanAvatar3D({ isSpeaking, isMuted, activeAnimName, mouse }) 
 
     if (targetAction && currentActionRef.current !== targetAction) {
       if (currentActionRef.current) {
-        currentActionRef.current.fadeOut(0.4);
+        currentActionRef.current.fadeOut(0.45);
       }
-      targetAction.reset().fadeIn(0.4).play();
+      targetAction.reset().fadeIn(0.45).play();
       currentActionRef.current = targetAction;
     }
   }, [actions, isSpeaking, activeAnimName]);
 
-  // Frame-by-Frame Lip Sync, Natural Blinking, Smiling & Head Tracking
+  // Frame-by-Frame Speech Lip-Sync, Natural Blinking, Smile & Head Tracking
   useFrame((state, delta) => {
     const headMesh = nodes.Wolf3D_Head;
     const teethMesh = nodes.Wolf3D_Teeth;
@@ -147,26 +174,26 @@ function RealisticHumanAvatar3D({ isSpeaking, isMuted, activeAnimName, mouse }) 
         }
       };
 
-      // 1. Natural Human Blinking (~3.2s intervals, 0.16s smooth eyelid motion)
+      // 1. Natural Human Blinking (~3.4s interval, 0.16s smooth eyelid motion)
       blinkTimer.current += delta;
       let blinkVal = 0;
-      if (blinkTimer.current > 3.2) {
-        const blinkPhase = (blinkTimer.current - 3.2) / 0.16;
+      if (blinkTimer.current > 3.4) {
+        const blinkPhase = (blinkTimer.current - 3.4) / 0.16;
         if (blinkPhase <= 1) {
           blinkVal = Math.sin(blinkPhase * Math.PI);
         } else {
-          blinkTimer.current = Math.random() * 0.7; // slight natural cadence variation
+          blinkTimer.current = Math.random() * 0.7;
         }
       }
       setMorph('eyeBlinkLeft', blinkVal, 0.38);
       setMorph('eyeBlinkRight', blinkVal, 0.38);
 
-      // 2. Friendly and Confident Natural Smile
-      setMorph('mouthSmileLeft', 0.24, 0.08);
-      setMorph('mouthSmileRight', 0.24, 0.08);
-      setMorph('browInnerUp', 0.12, 0.08);
+      // 2. Soft, Friendly, Confident Smile & Arched Brows (Exact Match to Reference)
+      setMorph('mouthSmileLeft', 0.28, 0.08);
+      setMorph('mouthSmileRight', 0.28, 0.08);
+      setMorph('browInnerUp', 0.14, 0.08);
 
-      // 3. Multi-viseme Speech Lip Sync
+      // 3. Realistic Speech Viseme Synchronization
       if (isSpeaking) {
         const t = state.clock.elapsedTime * 14;
         const jaw = Math.max(0, Math.sin(t) * 0.45 + Math.sin(t * 2.1) * 0.2 + 0.12);
@@ -189,12 +216,14 @@ function RealisticHumanAvatar3D({ isSpeaking, isMuted, activeAnimName, mouse }) 
       }
     }
 
-    // 4. Natural Head & Neck Mouse Tracking
+    // 4. Natural Head & Neck Mouse Tracking (Subtle natural head tilt as in reference)
     if (nodes.Head) {
       const targetRotY = (mouse.current?.x || 0) * 0.22;
       const targetRotX = -(mouse.current?.y || 0) * 0.14;
+      // Slight default head tilt (-0.06 rad z) matching the charming pose in the reference photo
       nodes.Head.rotation.y = THREE.MathUtils.lerp(nodes.Head.rotation.y, targetRotY, 0.06);
       nodes.Head.rotation.x = THREE.MathUtils.lerp(nodes.Head.rotation.x, targetRotX, 0.06);
+      nodes.Head.rotation.z = THREE.MathUtils.lerp(nodes.Head.rotation.z, -0.06, 0.04);
     }
     if (nodes.Neck) {
       const targetRotY = (mouse.current?.x || 0) * 0.1;
@@ -205,28 +234,57 @@ function RealisticHumanAvatar3D({ isSpeaking, isMuted, activeAnimName, mouse }) 
   });
 
   return (
-    <group ref={avatarGroupRef} position={[0, -1.42, 0]} scale={1.14} dispose={null}>
+    <group ref={avatarGroupRef} position={[0, -1.35, 0]} scale={1.24} dispose={null}>
+      {/* Skinned Human Mesh with Arms, Hands, Bob Hair, Blazer */}
       <primitive object={scene} />
+
+      {/* Crisp White Crewneck Inner Top Collar (visible inside the blazer lapels) */}
+      <mesh position={[0, 1.34, 0.065]} rotation={[-0.12, 0, 0]}>
+        <planeGeometry args={[0.13, 0.14]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.8} />
+      </mesh>
+
+      {/* Small Elegant Gold Hoop Earrings (matching the reference photo) */}
+      {nodes.Head && (
+        <group position={[0, 1.58, 0]}>
+          {/* Left Earring */}
+          <mesh position={[-0.088, -0.02, -0.015]} rotation={[0, 0, 0.1]}>
+            <torusGeometry args={[0.012, 0.0032, 12, 24]} />
+            <meshStandardMaterial color="#ffd700" metalness={0.92} roughness={0.18} />
+          </mesh>
+          {/* Right Earring */}
+          <mesh position={[0.088, -0.02, -0.015]} rotation={[0, 0, -0.1]}>
+            <torusGeometry args={[0.012, 0.0032, 12, 24]} />
+            <meshStandardMaterial color="#ffd700" metalness={0.92} roughness={0.18} />
+          </mesh>
+        </group>
+      )}
+
+      {/* Soft Ground Contact Shadow Plane */}
+      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.6, 1.6]} />
+        <shadowMaterial opacity={0.28} />
+      </mesh>
     </group>
   );
 }
 
-// Preload models for immediate responsiveness
-useGLTF.preload(asset('avatar_female_rpm.glb'));
+// Preload models
+useGLTF.preload(asset('avatar_vaishnavi_presenter.glb'));
 useGLTF.preload(asset('animations.glb'));
 
-// Fallback spinner while GLB streams in
-function AvatarLoadingFallback() {
+// Clean loading placeholder while model streams in
+function PresenterLoadingFallback() {
   return (
-    <mesh position={[0, 0, 0]}>
-      <sphereGeometry args={[0.2, 16, 16]} />
-      <meshStandardMaterial color="#fcdbe4" wireframe />
-    </mesh>
+    <div className="seamless-loading-state" aria-hidden="true">
+      <div className="loading-flower-spinner" />
+      <span>Summoning Vaishnavi's Presenter...</span>
+    </div>
   );
 }
 
 // =========================================================================
-// 2. MAIN SPEAKING AVATAR 3D HERO COMPONENT
+// 2. MAIN FLOATING 3D PRESENTER HERO COMPONENT (NO BOX, SEAMLESS IN HERO)
 // =========================================================================
 export default function SpeakingAvatar3D({ openCaseStudy }) {
   const [activeTab, setActiveTab] = useState('avatar'); // 'avatar' | 'photo'
@@ -371,7 +429,6 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
     const nextMuted = !isMuted;
     setIsMuted(nextMuted);
     if (isPlaying && utteranceRef.current) {
-      // Restart at current segment with updated volume
       startSpeechSequence(currentSegmentIndex);
     }
   };
@@ -379,21 +436,21 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
   const activeSegment = INTRO_SCRIPT_SEGMENTS[currentSegmentIndex] || INTRO_SCRIPT_SEGMENTS[0];
 
   return (
-    <div className="speaking-hero-container">
-      {/* View Mode Toggle: 3D Speaking Avatar vs. Portrait Photo */}
-      <div className="avatar-view-toggle-bar">
+    <div className="seamless-presenter-wrapper">
+      {/* View Mode Toggle: 3D Virtual Presenter vs. Portrait Photo */}
+      <div className="presenter-toggle-pills">
         <button
           type="button"
-          className={`avatar-tab-btn ${activeTab === 'avatar' ? 'active' : ''}`}
+          className={`presenter-tab-pill ${activeTab === 'avatar' ? 'active' : ''}`}
           onClick={() => setActiveTab('avatar')}
-          aria-label="Switch to 3D Speaking Avatar"
+          aria-label="Switch to 3D Virtual Human Presenter"
         >
-          <Bot size={14} /> <span>3D AI Avatar</span>
+          <Bot size={14} /> <span>3D Virtual Presenter</span>
           <span className="live-sparkle-dot" />
         </button>
         <button
           type="button"
-          className={`avatar-tab-btn ${activeTab === 'photo' ? 'active' : ''}`}
+          className={`presenter-tab-pill ${activeTab === 'photo' ? 'active' : ''}`}
           onClick={() => {
             setActiveTab('photo');
             if (isPlaying && window.speechSynthesis) {
@@ -409,33 +466,36 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
 
       {activeTab === 'avatar' ? (
         /* =========================================================================
-           1. 3D SPEAKING AI GIRL PRESENTER STAGE
+           1. FULL-SIZE SEAMLESS 3D PRESENTER (NO BOX, TRANSPARENT STAGE)
+           Standing directly in hero section with arms & hands gesturing freely
            ========================================================================= */
-        <InteractiveCard3D className="speaking-avatar-glass-card" depth={18} glowColor="rgba(222, 93, 149, 0.28)">
-          <div className="avatar-canvas-wrap">
+        <div className="seamless-hero-presenter-stage">
+          {/* Transparent 3D Canvas - 75% to 90% of Hero Height */}
+          <div className="presenter-canvas-container">
             {isWebGLAvailable() ? (
               <Canvas
-                camera={{ position: [0, 0.22, 1.48], fov: 36 }}
+                camera={{ position: [0, 0.28, 1.82], fov: 33 }}
                 gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
                 dpr={[1, 1.5]}
                 shadows
-                style={{ width: '100%', height: '390px' }}
+                style={{ width: '100%', height: '100%' }}
               >
-                <ambientLight intensity={1.4} color="#fff4f8" />
+                {/* Cinematic Studio 3-Point Lighting */}
+                <ambientLight intensity={1.5} color="#fff6f8" />
                 <directionalLight
-                  position={[2, 3.5, 3]}
-                  intensity={1.9}
+                  position={[2.5, 3.8, 3]}
+                  intensity={2.1}
                   castShadow
                   shadow-mapSize={[1024, 1024]}
                 />
                 {/* Soft blush pink fill light */}
-                <directionalLight position={[-2.5, 1.8, 2]} intensity={0.9} color="#fae8f0" />
-                {/* Dreamy pink hair and shoulder rim highlight */}
-                <pointLight position={[0, 2.2, -2]} intensity={1.1} color="#ffccd8" />
-                <pointLight position={[0, 0.3, 1.1]} intensity={0.5} color="#ffeef5" />
+                <directionalLight position={[-3, 1.8, 2.2]} intensity={1.0} color="#fae8f0" />
+                {/* Hair and shoulder rim highlight */}
+                <pointLight position={[0, 2.6, -2.2]} intensity={1.3} color="#ffd4e2" />
+                <pointLight position={[0, 0.2, 1.4]} intensity={0.6} color="#ffffff" />
 
-                <Suspense fallback={<AvatarLoadingFallback />}>
-                  <RealisticHumanAvatar3D
+                <Suspense fallback={null}>
+                  <ExactReferencePresenter3D
                     isSpeaking={isPlaying}
                     isMuted={isMuted}
                     activeAnimName={activeSegment.animation}
@@ -445,7 +505,7 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
               </Canvas>
             ) : (
               <div className="avatar-fallback-art">
-                <img src={asset('hero-photo.png')} alt="Vaishnavi Kedar" width="360" height="360" />
+                <img src={asset('hero-photo.png')} alt="Vaishnavi Kedar" width="460" height="540" />
               </div>
             )}
 
@@ -462,8 +522,8 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
               )}
             </div>
 
-            {/* Top 6 Drishti Award Badge Floating on Stage */}
-            <div className="hero-3d-badge avatar-badge-pos">
+            {/* Top 6 Drishti Award Floating Badge */}
+            <div className="hero-3d-badge presenter-award-badge">
               <div className="badge-trophy-icon">
                 <Trophy size={16} />
               </div>
@@ -475,9 +535,9 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
           </div>
 
           {/* =========================================================================
-              2. VOICE CONTROLS & SYNCHRONIZED SUBTITLES
+              2. VOICE CONTROLS & SYNCHRONIZED SUBTITLES (FLOATING BELOW PRESENTER)
               ========================================================================= */}
-          <div className="avatar-controls-panel">
+          <div className="presenter-floating-deck">
             <div className="avatar-voice-actions">
               <button
                 type="button"
@@ -526,7 +586,7 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
               <p className="subtitles-live-text">“{activeSegment.text}”</p>
             </div>
           </div>
-        </InteractiveCard3D>
+        </div>
       ) : (
         /* =========================================================================
            2. ORIGINAL EDITORIAL PHOTO PORTRAIT
