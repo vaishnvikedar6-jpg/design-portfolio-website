@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useState, useEffect, useCallback, Suspense } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
 import {
@@ -138,6 +138,31 @@ function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse 
     });
   }, [scene]);
 
+  // Attach small elegant gold hoop earrings directly to head bone so they move 100% with head motions
+  useEffect(() => {
+    if (!nodes.Head) return;
+    if (nodes.Head.getObjectByName('LeftEarringGold')) return;
+
+    const earMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#ffd700'),
+      metalness: 0.94,
+      roughness: 0.16,
+    });
+    const earGeo = new THREE.TorusGeometry(0.012, 0.0032, 12, 24);
+
+    const leftEar = new THREE.Mesh(earGeo, earMat);
+    leftEar.name = 'LeftEarringGold';
+    leftEar.position.set(-0.088, -0.018, -0.015);
+    leftEar.rotation.set(0, 0, 0.12);
+    nodes.Head.add(leftEar);
+
+    const rightEar = new THREE.Mesh(earGeo, earMat);
+    rightEar.name = 'RightEarringGold';
+    rightEar.position.set(0.088, -0.018, -0.015);
+    rightEar.rotation.set(0, 0, -0.12);
+    nodes.Head.add(rightEar);
+  }, [nodes.Head]);
+
   // Smooth MoCap Animation Transitions (Idle vs Talking Gestures)
   useEffect(() => {
     if (!actions) return;
@@ -220,7 +245,7 @@ function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse 
     if (nodes.Head) {
       const targetRotY = (mouse.current?.x || 0) * 0.22;
       const targetRotX = -(mouse.current?.y || 0) * 0.14;
-      // Slight default head tilt (-0.06 rad z) matching the charming pose in the reference photo
+      // Charming subtle head tilt (-0.06 rad z) matching reference photo
       nodes.Head.rotation.y = THREE.MathUtils.lerp(nodes.Head.rotation.y, targetRotY, 0.06);
       nodes.Head.rotation.x = THREE.MathUtils.lerp(nodes.Head.rotation.x, targetRotX, 0.06);
       nodes.Head.rotation.z = THREE.MathUtils.lerp(nodes.Head.rotation.z, -0.06, 0.04);
@@ -234,7 +259,7 @@ function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse 
   });
 
   return (
-    <group ref={avatarGroupRef} position={[0, -1.35, 0]} scale={1.24} dispose={null}>
+    <group ref={avatarGroupRef} position={[0.10, -0.96, 0]} scale={0.96} dispose={null}>
       {/* Skinned Human Mesh with Arms, Hands, Bob Hair, Blazer */}
       <primitive object={scene} />
 
@@ -244,22 +269,6 @@ function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse 
         <meshStandardMaterial color="#ffffff" roughness={0.8} />
       </mesh>
 
-      {/* Small Elegant Gold Hoop Earrings (matching the reference photo) */}
-      {nodes.Head && (
-        <group position={[0, 1.58, 0]}>
-          {/* Left Earring */}
-          <mesh position={[-0.088, -0.02, -0.015]} rotation={[0, 0, 0.1]}>
-            <torusGeometry args={[0.012, 0.0032, 12, 24]} />
-            <meshStandardMaterial color="#ffd700" metalness={0.92} roughness={0.18} />
-          </mesh>
-          {/* Right Earring */}
-          <mesh position={[0.088, -0.02, -0.015]} rotation={[0, 0, -0.1]}>
-            <torusGeometry args={[0.012, 0.0032, 12, 24]} />
-            <meshStandardMaterial color="#ffd700" metalness={0.92} roughness={0.18} />
-          </mesh>
-        </group>
-      )}
-
       {/* Soft Ground Contact Shadow Plane */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1.6, 1.6]} />
@@ -267,6 +276,35 @@ function ExactReferencePresenter3D({ isSpeaking, isMuted, activeAnimName, mouse 
       </mesh>
     </group>
   );
+}
+
+// =========================================================================
+// CAMERA CONTROLLER: EYE-LEVEL HEAD FOCUS & 3/4 BODY VIEW WITHOUT CROPPING
+// =========================================================================
+function PresenterCameraController() {
+  const { camera, size } = useThree();
+
+  useEffect(() => {
+    const isMobile = size.width < 768;
+    const isTablet = size.width >= 768 && size.width < 1024;
+
+    if (isMobile) {
+      // Mobile: Head and shoulders framed centered with safe clearance above hair
+      camera.position.set(0.08, 0.44, 1.95);
+      camera.lookAt(0.10, 0.48, 0);
+    } else if (isTablet) {
+      // Tablet: Head to waist view
+      camera.position.set(0.10, 0.34, 2.22);
+      camera.lookAt(0.10, 0.40, 0);
+    } else {
+      // Desktop: Head to mid-thigh 3/4 body view with generous top padding
+      camera.position.set(0.10, 0.26, 2.44);
+      camera.lookAt(0.10, 0.38, 0);
+    }
+    camera.updateProjectionMatrix();
+  }, [camera, size.width, size.height]);
+
+  return null;
 }
 
 // Preload models
@@ -474,12 +512,13 @@ export default function SpeakingAvatar3D({ openCaseStudy }) {
           <div className="presenter-canvas-container">
             {isWebGLAvailable() ? (
               <Canvas
-                camera={{ position: [0, 0.28, 1.82], fov: 33 }}
+                camera={{ position: [0.10, 0.26, 2.44], fov: 34 }}
                 gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
                 dpr={[1, 1.5]}
                 shadows
                 style={{ width: '100%', height: '100%' }}
               >
+                <PresenterCameraController />
                 {/* Cinematic Studio 3-Point Lighting */}
                 <ambientLight intensity={1.5} color="#fff6f8" />
                 <directionalLight
